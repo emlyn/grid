@@ -176,3 +176,29 @@
             1 2 3] (vals gtb)))
     (is (= g0 (g/flip-lr glr)))
     (is (= g0 (g/flip-tb gtb)))))
+
+(deftest concat-test
+  (testing "Concatenate left-right"
+    (let [g0 (g/grid 3 2 [1 2 3
+                          4 5 6])
+          g1 (g/grid 1 2 [10
+                          11])
+          g2 (g/grid 2 2 [7 8
+                          9 0])]
+      (is (= [1 2 3 10 7 8
+              4 5 6 11 9 0]
+             (vals (g/concat-lr g0 g1 g2))))))
+  (testing "Concatenate top-bottom"
+    (let [g0 (g/grid 2 3 [1 2
+                          3 4
+                          5 6])
+          g1 (g/grid 2 1 [10 11])
+          g2 (g/grid 2 2 [7 8
+                          9 0])]
+      (is (= [1 2
+              3 4
+              5 6
+              10 11
+              7 8
+              9 0]
+             (vals (g/concat-tb g0 g1 g2)))))))

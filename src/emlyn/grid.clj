@@ -22,4 +22,6 @@
     rotate-left
     rotate-180
     flip-lr
-    flip-tb])
+    flip-tb
+    concat-lr
+    concat-tb])
