@@ -10,7 +10,7 @@
              (< -1 y h))
     (+ x (* w y))))
 
-(defn- shape->keys
+(defn shape->keys
   "Get the keys of a grid."
   [[w h]]
   (for [y (range h)

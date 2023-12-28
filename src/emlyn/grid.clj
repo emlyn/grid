@@ -1,7 +1,7 @@
 (ns emlyn.grid
   (:require [potemkin :refer [import-vars]]
             [emlyn.grid.type]
-            [emlyn.grid.algo]))
+            [emlyn.grid.transform]))
 
 (import-vars
   [emlyn.grid.type
@@ -9,6 +9,12 @@
     width
     height
     as-rows]
-  [emlyn.grid.algo
+  [emlyn.grid.transform
     map-vals
-    map-kv])
+    map-kv
+    transpose
+    rotate-right
+    rotate-left
+    rotate-180
+    flip-lr
+    flip-tb])
