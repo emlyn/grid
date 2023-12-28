@@ -1,14 +1,19 @@
 (ns emlyn.grid
   (:require [potemkin :refer [import-vars]]
             [emlyn.grid.type]
+            [emlyn.grid.convert]
             [emlyn.grid.transform]))
 
 (import-vars
   [emlyn.grid.type
     grid
     width
-    height
-    as-rows]
+    height]
+  [emlyn.grid.convert
+    as-rows
+    to-rows
+    to-map
+    to-map-of-maps]
   [emlyn.grid.transform
     map-vals
     map-kv

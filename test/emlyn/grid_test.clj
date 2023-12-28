@@ -101,6 +101,21 @@
         (is (= [1 2 3
                 nil 9 6] (vals g)))))))
 
+(deftest convert-test
+  (let [g (g/grid 3 2 [1 2 nil 4 nil 6])]
+    (is (= [1 2 nil
+            4 nil 6] (vals g)))
+    (is (= [[1 2 nil]
+            [4 nil 6]] (g/to-rows g)))
+    (is (= {[0 0] 1
+            [1 0] 2
+            [0 1] 4
+            [2 1] 6} (g/to-map g)))
+    (is (= {0 {0 1
+               1 4}
+            1 {0 2}
+            2 {1 6}} (g/to-map-of-maps g)))))
+
 (deftest map-vals-test
   (let [g1 (g/grid [[1 3 5] [2 4 6]])
         g2 (g/map-vals inc g1)]

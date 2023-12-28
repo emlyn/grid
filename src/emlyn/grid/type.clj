@@ -122,11 +122,6 @@
   [grid]
   (second (.shape grid)))
 
-(defn as-rows
-  "Get the grid as a sequence of rows."
-  [grid]
-  (partition (width grid) (.cells grid)))
-
 (defn grid
   "Construct a grid."
   ([data]
