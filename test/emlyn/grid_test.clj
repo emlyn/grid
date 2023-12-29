@@ -121,7 +121,11 @@
         g2 (g/map-vals inc g1)]
     (is (= (g/width g1) (g/width g2)))
     (is (= (g/height g1) (g/height g2)))
-    (is (= [2 4 6 3 5 7] (vals g2)))))
+    (is (= [2 4 6
+            3 5 7] (vals g2)))
+    (let [g3 (g/map-vals + g1 g2)]
+      (is (= [3 7 11
+              5 9 13] (vals g3))))))
 
 (deftest map-kv-test
   (let [g1 (g/grid 2 2 [[9 7] [5 3]])

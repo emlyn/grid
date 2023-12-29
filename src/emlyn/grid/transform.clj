@@ -3,13 +3,24 @@
 
 (defn map-vals
   "Map a function over the values of a grid."
-  [fn grid]
-  (->Grid (.shape grid) (mapv fn (.cells grid))))
+  [fn grid & grids]
+  (when-not (apply = (.shape grid) (map #(.shape %) grids))
+    (throw (IllegalArgumentException. "Grids must all be same shape")))
+  (->Grid (.shape grid)
+          (apply mapv fn
+                 (.cells grid)
+                 (map #(.cells %) grids))))
 
 (defn map-kv
   "Map a function over the keys and values of a grid."
-  [fn grid]
-  (->Grid (.shape grid) (mapv fn (keys grid) (.cells grid))))
+  [fn grid & grids]
+  (when-not (apply = (.shape grid) (map #(.shape %) grids))
+    (throw (IllegalArgumentException. "Grids must all be same shape")))
+  (->Grid (.shape grid)
+          (apply mapv fn
+                 (keys grid)
+                 (.cells grid)
+                 (map #(.cells %) grids))))
 
 (defn transpose
   "Transpose a grid."
