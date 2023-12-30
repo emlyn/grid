@@ -12,9 +12,10 @@
     height]
   [emlyn.grid.convert
     as-rows
-    to-rows
+    to-vec
+    to-vecs
     to-map
-    to-map-of-maps]
+    to-maps]
   [emlyn.grid.transform
     add-rows
     add-cols

@@ -1,8 +1,13 @@
 (ns emlyn.grid.convert
   (:require [emlyn.grid.type :refer [width]]))
 
-(defn to-rows
-  "Convert the grid to a sequence of rows."
+(defn to-vec
+  "Convert the grid to a flat vector of all values (left to right, top to bottom)."
+  [grid]
+  (.cells grid))
+
+(defn to-vecs
+  "Convert the grid to a vector of vectors, one for each row."
   [grid]
   (let [cells (.cells grid)
         w (width grid)]
@@ -10,10 +15,10 @@
           (range 0 (count cells) w))))
 
 (defn ^{:deprecated "0.2.0"
-        :superseded-by "to-rows"} as-rows
-  "DEPRECATED: Use `to-rows` instead."
+        :superseded-by "to-vecs"} as-rows
+  "DEPRECATED: Use `to-vecs` instead."
   [grid]
-  (to-rows grid))
+  (to-vecs grid))
 
 (defn to-map
   "Convert the grid to a plain map of coordinate to value."
@@ -26,7 +31,7 @@
              {}
              grid))
 
-(defn to-map-of-maps
+(defn to-maps
   "Convert the grid to a map of x to map of y to value."
   [grid & {:keys [filter] :or {filter some?}}]
   (reduce-kv (fn [m k v]
