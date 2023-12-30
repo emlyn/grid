@@ -2,7 +2,8 @@
   (:require [potemkin :refer [import-vars]]
             [emlyn.grid.type]
             [emlyn.grid.convert]
-            [emlyn.grid.transform]))
+            [emlyn.grid.transform]
+            [emlyn.grid.print]))
 
 (import-vars
   [emlyn.grid.type

@@ -4,7 +4,10 @@
 (defn to-rows
   "Convert the grid to a sequence of rows."
   [grid]
-  (partition (width grid) (.cells grid)))
+  (let [cells (.cells grid)
+        w (width grid)]
+    (mapv #(subvec cells % (+ % w))
+          (range 0 (count cells) w))))
 
 (defn ^{:deprecated "0.2.0"
         :superseded-by "to-rows"} as-rows
