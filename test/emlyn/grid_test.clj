@@ -209,6 +209,32 @@
                         [6]]
            (g/drop-cols g :pos 0 :num 2)))))
 
+(deftest empty-grid-test
+  (let [g #emlyn/grid []]
+    (is (= (g/grid 0 0) g)))
+  (let [g #emlyn/grid [[]]]
+    (is (g/grid 0 1) g))
+  (let [g #emlyn/grid [[] []]]
+    (is (g/grid 0 2) g))
+  (let [g #emlyn/grid {}]
+    (is (= (g/grid 0 0) g)))
+  (let [g #emlyn/grid {0 {}}]
+    (is (= (g/grid 0 1) g)))
+  (let [g #emlyn/grid {1 {}}]
+    (is (= (g/grid 0 2) g)))
+  (let [g (g/grid 0 0)]
+    (is (= (g/grid 0 1) (g/add-rows g)))
+    (is (= (g/grid 1 0) (g/add-cols g)))
+    (is (= (g/grid 1 1)
+           (g/add-rows (g/add-cols g))
+           (g/add-cols (g/add-rows g)))))
+  (let [g (g/grid 1 1)]
+    (is (= (g/grid 0 1) (g/drop-cols g)))
+    (is (= (g/grid 1 0) (g/drop-cols g)))
+    (is (= (g/grid 0 0)
+           (g/drop-rows (g/drop-cols g))
+           (g/drop-cols (g/drop-rows g))))))
+
 (deftest map-vals-test
   (let [g1 #emlyn/grid [[1 3 5]
                         [2 4 6]]

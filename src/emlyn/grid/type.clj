@@ -33,13 +33,37 @@
        (every? #(and (map? %)
                      (every? nat-int? (keys %))) (vals data))))
 
+(def-map-type Grid [shape cells]
+  (get [_ pos default] (when-let [i (pos->index shape pos)]
+                         (get cells i default)))
+  (assoc [_ pos val] (if-let [i (pos->index shape pos)]
+                       (Grid. shape (assoc cells i val))
+                       (throw (IndexOutOfBoundsException.))))
+  (dissoc [this pos] (if-let [i (pos->index shape pos)]
+                       (Grid. shape (assoc cells i nil))
+                       this))
+  (keys [_] (shape->keys shape))
+  (meta [_] (meta shape))
+  (with-meta [_ m] (Grid. (with-meta shape m) cells))
+  (count [_] (apply * shape)))
+
+(defn width
+  "The width of a grid in cells."
+  [grid]
+  (first (.shape grid)))
+
+(defn height
+  "The height of a grid in cells."
+  [grid]
+  (second (.shape grid)))
+
 (defn- infer-shape
   "Infer the shape of a grid from its init data."
   [data]
   (cond
     (and (sequential? data)
          (every? #(or (sequential? %) (string? %)) data)
-         (apply = (map count data)))
+         (or (empty? data) (apply = (map count data))))
     [(count (first data))
      (count data)]
 
@@ -108,30 +132,6 @@
         :else
         (throw (IllegalArgumentException. "Invalid init data."))))))
 
-(def-map-type Grid [shape cells]
-  (get [_ pos default] (when-let [i (pos->index shape pos)]
-                         (get cells i default)))
-  (assoc [_ pos val] (if-let [i (pos->index shape pos)]
-                       (Grid. shape (assoc cells i val))
-                       (throw (IndexOutOfBoundsException.))))
-  (dissoc [this pos] (if-let [i (pos->index shape pos)]
-                       (Grid. shape (assoc cells i nil))
-                       this))
-  (keys [_] (shape->keys shape))
-  (meta [_] (meta shape))
-  (with-meta [_ m] (Grid. (with-meta shape m) cells))
-  (count [_] (apply * shape)))
-
-(defn width
-  "The width of a grid in cells."
-  [grid]
-  (first (.shape grid)))
-
-(defn height
-  "The height of a grid in cells."
-  [grid]
-  (second (.shape grid)))
-
 (defn grid
   "Construct a grid."
   ([data]
@@ -141,5 +141,5 @@
        (grid w h data)
        (throw (IllegalArgumentException.
                "Unable to infer shape from init data.")))))
-  ([w h & [init]]
-   (->Grid [w h] (massage w h init))))
+  ([w h & [data]]
+   (->Grid [w h] (massage w h data))))
