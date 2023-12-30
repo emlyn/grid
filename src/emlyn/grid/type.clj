@@ -56,16 +56,15 @@
   "Massage init data into a vector of cells."
   [w h data]
   (cond
+    ;; Unspecified data gets filled with nil
     (nil? data)
     (into [] (repeat (* w h) nil))
 
+    ;; A fn gets applied to the coordinates
     (fn? data)
     (mapv (partial apply data) (shape->keys [w h]))
 
-    (and (or (sequential? data) (string? data))
-         (= (* w h) (count data)))
-    (vec data)
-
+    ;; Map of coordinate to value
     (map-data? data)
     (reduce-kv (fn [cells pos val]
                  (if-let [i (pos->index [w h] pos)]
@@ -74,6 +73,7 @@
                (into [] (repeat (* w h) nil))
                data)
 
+    ;; Map of x to map of y to value
     (mapmap-data? data)
     (reduce-kv (fn [cells x ymap]
                  (reduce-kv (fn [cells y val]
@@ -86,16 +86,26 @@
                data)
 
     :else
-    (let [data (if (string? data)
-                 (str/split-lines data)
-                 data)]
-      (if (and (sequential? data)
-               (every? #(or (sequential? %) (string? %)) data))
+    (let [split-data (if (string? data)
+                       (str/split-lines data)
+                       data)]
+      (cond
+        ;; A sequence of sequences, or a newline-separated string
+        (and (sequential? split-data)
+             (every? #(or (sequential? %) (string? %)) split-data))
         (reduce into
                 []
                 (take h
-                      (concat (map #(take w (concat % (repeat nil))) data)
+                      (concat (map #(take w (concat % (repeat nil))) split-data)
                               (repeat (repeat w nil)))))
+
+        ;; Finally a flat sequence of values of exactly the right length.
+        ;; This must be last, as it mustn't take precedence over seq-of-seqs.
+        (and (or (sequential? data) (string? data))
+             (= (* w h) (count data)))
+        (vec data)
+
+        :else
         (throw (IllegalArgumentException. "Invalid init data."))))))
 
 (def-map-type Grid [shape cells]
