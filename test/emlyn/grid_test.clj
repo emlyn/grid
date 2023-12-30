@@ -123,9 +123,9 @@
 (deftest convert-test
   (let [g #emlyn/grid [[1 2 nil] [4 nil 6]]]
     (is (= [1 2 nil
-            4 nil 6] (vals g)))
+            4 nil 6] (g/to-vec g)))
     (is (= [[1 2 nil]
-            [4 nil 6]] (g/to-rows g)))
+            [4 nil 6]] (g/to-vecs g)))
     (is (= {[0 0] 1
             [1 0] 2
             [0 1] 4
@@ -133,7 +133,7 @@
     (is (= {0 {0 1
                1 4}
             1 {0 2}
-            2 {1 6}} (g/to-map-of-maps g)))))
+            2 {1 6}} (g/to-maps g)))))
 
 (deftest add-rows-test
   (let [g #emlyn/grid [[1 2 3]
