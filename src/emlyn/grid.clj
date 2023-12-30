@@ -16,6 +16,10 @@
     to-map
     to-map-of-maps]
   [emlyn.grid.transform
+    add-rows
+    add-cols
+    drop-rows
+    drop-cols
     map-vals
     map-kv
     transpose

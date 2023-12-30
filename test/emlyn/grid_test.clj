@@ -135,6 +135,80 @@
             1 {0 2}
             2 {1 6}} (g/to-map-of-maps g)))))
 
+(deftest add-rows-test
+  (let [g #emlyn/grid [[1 2 3]
+                       [4 5 6]]]
+    (is (= #emlyn/grid [[1 2 3]
+                        [4 5 6]
+                        [nil nil nil]]
+           (g/add-rows g)))
+    (is (= #emlyn/grid [[1 2 3]
+                        [4 5 6]
+                        [nil nil nil]
+                        [nil nil nil]]
+           (g/add-rows g :num 2)))
+    (is (= #emlyn/grid [[nil nil nil]
+                        [1 2 3]
+                        [4 5 6]]
+           (g/add-rows g :pos 0)))
+    (is (= #emlyn/grid [[1 2 3]
+                        [nil nil nil]
+                        [nil nil nil]
+                        [4 5 6]]
+           (g/add-rows g :pos 1 :num 2)))))
+
+(deftest add-cols-test
+  (let [g #emlyn/grid [[1 2]
+                       [3 4]
+                       [5 6]]]
+    (is (= #emlyn/grid [[1 2 nil]
+                        [3 4 nil]
+                        [5 6 nil]]
+           (g/add-cols g)))
+    (is (= #emlyn/grid [[1 2 nil nil]
+                        [3 4 nil nil]
+                        [5 6 nil nil]]
+           (g/add-cols g :num 2)))
+    (is (= #emlyn/grid [[nil 1 2]
+                        [nil 3 4]
+                        [nil 5 6]]
+           (g/add-cols g :pos 0)))
+    (is (= #emlyn/grid [[1 nil nil 2]
+                        [3 nil nil 4]
+                        [5 nil nil 6]]
+           (g/add-cols g :pos 1 :num 2)))))
+
+(deftest drop-rows-test
+  (let [g #emlyn/grid [[1 2]
+                       [3 4]
+                       [5 6]]]
+    (is (= #emlyn/grid [[1 2]
+                        [3 4]]
+           (g/drop-rows g)))
+    (is (= #emlyn/grid [[1 2]]
+           (g/drop-rows g :num 2)))
+    (is (= #emlyn/grid [[3 4]
+                        [5 6]]
+           (g/drop-rows g :pos 0)))
+    (is (= #emlyn/grid [[5 6]]
+           (g/drop-rows g :pos 0 :num 2)))))
+
+(deftest drop-cols-test
+  (let [g #emlyn/grid [[1 2 3]
+                       [4 5 6]]]
+    (is (= #emlyn/grid [[1 2]
+                        [4 5]]
+           (g/drop-cols g)))
+    (is (= #emlyn/grid [[1]
+                        [4]]
+           (g/drop-cols g :num 2)))
+    (is (= #emlyn/grid [[2 3]
+                        [5 6]]
+           (g/drop-cols g :pos 0)))
+    (is (= #emlyn/grid [[3]
+                        [6]]
+           (g/drop-cols g :pos 0 :num 2)))))
+
 (deftest map-vals-test
   (let [g1 #emlyn/grid [[1 3 5]
                         [2 4 6]]
