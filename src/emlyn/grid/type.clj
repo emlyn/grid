@@ -10,6 +10,26 @@
              (< -1 y h))
     (+ x (* w y))))
 
+(defn slice->range
+  ([limit] (range limit))
+  ([_ v] [v])
+  ([_ lo hi] (range lo hi)))
+
+(defn- slice->indices
+  [[w h] [x y]]
+  (case [(int? x) (int? y)]
+    [true true] (pos->index [w h] [x y])
+    [true false] (map #(pos->index [w h] [x %]) (apply slice->range h y))
+    [false true] (map #(pos->index [w h] [% y]) (apply slice->range w x))
+    [false false]
+    (let [ry (apply slice->range h y)
+          rx (apply slice->range w x)]
+      [(count rx)
+       (count ry)
+       (for [y ry
+             x rx]
+         (pos->index [w h] [x y]))])))
+
 (defn shape->keys
   "Get the keys of a grid."
   [[w h]]
@@ -33,9 +53,18 @@
        (every? #(and (map? %)
                      (every? nat-int? (keys %))) (vals data))))
 
+(declare grid)
+
 (def-map-type Grid [shape cells]
-  (get [_ pos default] (when-let [i (pos->index shape pos)]
-                         (get cells i default)))
+  (get [_ pos default]
+       (let [i (slice->indices shape pos)]
+         (cond
+           (nil? i) default
+           (int? i) (get cells i default)
+           (seq? i) (mapv #(get cells % default) i)
+           :else
+           (let [[w h d] i]
+             (grid w h (mapv #(get cells % default) d))))))
   (assoc [_ pos val] (if-let [i (pos->index shape pos)]
                        (Grid. shape (assoc cells i val))
                        (throw (IndexOutOfBoundsException.))))

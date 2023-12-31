@@ -107,6 +107,39 @@
   (is (thrown? IllegalArgumentException (g/grid {[1 -1] 3})))
   (is (thrown? IllegalArgumentException (g/grid {1 {-1 3}}))))
 
+(deftest get-test
+ (let [g #emlyn/grid [[1 2 3 4]
+                      [5 6 7 8]
+                      [9 0 1 2]]]
+   (testing "Get a single value"
+     (is (= 1 (g [0 0]) (get g [0 0])))
+     (is (= 2 (g [3 2]) (get g [3 2]))))
+   (testing "Get a 1D slice"
+     (is (= [1 2 3 4]
+            (g [[0 4] 0])
+            (get g [[0 4] 0])
+            (get g [[] 0])))
+     (is (= [1 5 9]
+            (g [0 [0 3]])
+            (get g [0 [0 3]])
+            (get g [0 []]))))
+   (testing "Get a 2D grid"
+     (is (= g
+            (g [[] []])
+            (get g [[] []])))
+     (is (= #emlyn/grid [[1 2 3 4]]
+            (g [[] [0]])
+            (get g [[] [0]])))
+     (is (= #emlyn/grid [[1]
+                         [5]
+                         [9]]
+            (g [[0] []])
+            (get g [[0] []])))
+     (is (= #emlyn/grid [[6 7]
+                         [0 1]]
+            (g [[1 3] [1 3]])
+            (get g [[1 3] [1 3]]))))))
+
 (deftest assoc-test
   (let [g #emlyn/grid [[1 2 3]
                        [4 5 6]]]
