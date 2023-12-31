@@ -9,7 +9,11 @@
 
 (defmethod print-dup Grid [grid writer]
   (.write writer "#emlyn/grid ")
-  (print-method (to-vecs grid) writer))
+  ;; By default, to-vecs creates subvectors, which print differently,
+  ;; so convert them to plain vectors for printing:
+  (print-dup (mapv #(into [] %)
+                   (to-vecs grid))
+             writer))
 
 (defn pprint-grid
   [grid]

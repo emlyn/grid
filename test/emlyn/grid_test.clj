@@ -361,3 +361,9 @@
                           [7 8]
                           [9 0]]
              (g/concat-tb g0 g1 g2))))))
+
+(deftest print-test
+  (let [g #emlyn/grid [[1 2 3] [4 5 6]]]
+    (is (= "[[1 2 3] [4 5 6]]" (pr-str g)))
+    (is (= "#emlyn/grid [[1 2 3] [4 5 6]]"
+           (binding [*print-dup* true] (pr-str g))))))
