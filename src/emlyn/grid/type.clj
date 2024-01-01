@@ -64,13 +64,32 @@
            (seq? i) (mapv #(get cells % default) i)
            :else
            (let [[w h d] i]
-             (grid w h (mapv #(get cells % default) d))))))
-  (assoc [_ pos val] (if-let [i (pos->index shape pos)]
-                       (Grid. shape (assoc cells i val))
-                       (throw (IndexOutOfBoundsException.))))
-  (dissoc [this pos] (if-let [i (pos->index shape pos)]
-                       (Grid. shape (assoc cells i nil))
-                       this))
+             (Grid. [w h] (mapv #(get cells % default) d))))))
+  (assoc [_ pos val]
+         (let [i (slice->indices shape pos)]
+           (cond
+             (nil? i) (throw (IndexOutOfBoundsException.))
+             (int? i) (Grid. shape (assoc cells i val))
+             (seq? i) (Grid. shape (reduce (fn [c [i v]]
+                                             (assoc c i v))
+                                           cells
+                                           (map vector i (concat val (repeat nil)))))
+             :else    (let [[w h d] i
+                            g (grid w h val)]
+                        (Grid. shape
+                               (reduce (fn [c [i v]]
+                                         (assoc c i v))
+                                       cells
+                                       (map (fn [i [x y]]
+                                              [i (get g [x y])]) d (shape->keys [w h]))))))))
+  (dissoc [this pos]
+          (let [i (slice->indices shape pos)]
+            (cond
+              (nil? i) this
+              (int? i) (Grid. shape (assoc cells i nil))
+              (seq? i) (Grid. shape (reduce (fn [c i] (assoc c i nil)) cells i))
+              :else    (let [[_ _ d] i]
+                         (Grid. shape (reduce #(assoc %1 %2 nil) cells d))))))
   (keys [_] (shape->keys shape))
   (meta [_] (meta shape))
   (with-meta [_ m] (Grid. (with-meta shape m) cells))
@@ -112,6 +131,15 @@
     ;; Unspecified data gets filled with nil
     (nil? data)
     (into [] (repeat (* w h) nil))
+
+    (instance? Grid data)
+    (if (= [w h] (.shape data))
+      (.cells data)
+      (reduce into
+              []
+              (take h
+                    (concat (map #(take w (concat % (repeat nil))) (partition (first (.shape data)) (.cells data)))
+                            (repeat (repeat w nil))))))
 
     ;; A fn gets applied to the coordinates
     (fn? data)
@@ -164,8 +192,10 @@
 (defn grid
   "Construct a grid."
   ([data]
-   (if (string? data)
-     (grid (str/split-lines data))
+   (cond
+     (instance? Grid data) data
+     (string? data) (grid (str/split-lines data))
+     :else
      (if-let [[w h] (infer-shape data)]
        (grid w h data)
        (throw (IllegalArgumentException.

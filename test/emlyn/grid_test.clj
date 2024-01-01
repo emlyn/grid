@@ -143,15 +143,38 @@
 (deftest assoc-test
   (let [g #emlyn/grid [[1 2 3]
                        [4 5 6]]]
-    (is (= [1 2 3 4 5 6] (vals g)))
-    (let [g (assoc g [1 1] 9)]
-      (is (= 9 (g [1 1])))
-      (is (= #emlyn/grid [[1 2 3]
-                          [4 9 6]] g))
-      (let [g (dissoc g [0 1])]
-        (is (nil? (g [0 1])))
+    (testing "Assoc single value"
+      (let [g (assoc g [1 1] 9)]
+        (is (= 9 (g [1 1])))
         (is (= #emlyn/grid [[1 2 3]
-                            [nil 9 6]] g))))))
+                            [4 9 6]] g))
+        (let [g (dissoc g [0 1])]
+          (is (nil? (g [0 1])))
+          (is (= #emlyn/grid [[1 2 3]
+                              [nil 9 6]] g)))))
+    (testing "Assoc 1D row of values"
+      (let [g (assoc g [[] 1] [7 8 9])]
+        (is (= #emlyn/grid [[1 2 3]
+                            [7 8 9]]
+               g))
+        (is (= #emlyn/grid [[nil nil nil]
+                            [7 8 9]]
+               (dissoc g [[] 0]))))
+      (let [g (assoc g [1 []] [7 8])]
+        (is (= #emlyn/grid [[1 7 3]
+                            [4 8 6]]
+               g))
+        (is (= #emlyn/grid [[nil 7 3]
+                            [nil 8 6]]
+               (dissoc g [0 []])))))
+    (testing "Assoc 2D grid of values"
+      (let [g (assoc g [[1 3] [0 2]] [[7 8] [9 0]])]
+        (is (= #emlyn/grid [[1 7 8]
+                            [4 9 0]]
+               g))
+        (is (= #emlyn/grid [[nil nil 8]
+                            [nil nil 0]]
+               (dissoc g [[0 2] []])))))))
 
 (deftest convert-test
   (let [g #emlyn/grid [[1 2 nil] [4 nil 6]]]
