@@ -1,6 +1,7 @@
 (ns emlyn.grid
   (:require [potemkin :refer [import-vars]]
             [emlyn.grid.impl]
+            [emlyn.grid.everywhere]
             [emlyn.grid.convert]
             [emlyn.grid.transform]
             [emlyn.grid.print]))
@@ -10,6 +11,8 @@
     grid
     width
     height]
+  [emlyn.grid.everywhere
+    everywhere]
   [emlyn.grid.convert
     as-rows
     to-vec

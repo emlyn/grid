@@ -47,7 +47,19 @@
       (is (= 2 (g/height g)))
       (is (= 1 (g [0 0])))
       (is (= [1 nil 3
-              nil 2 4] (vals g))))))
+              nil 2 4] (vals g)))))
+  (testing "Construct from shape and grid"
+    (let [g (g/grid 3 3 (g/grid 4 2 [[1 2 3 4]
+                                     [5 6 7 8]]))]
+      (is (= #emlyn/grid [[1 2 3]
+                          [5 6 7]
+                          [nil nil nil]]
+             g))))
+  (testing "Construct from shape and everywhere"
+    (let [g (g/grid 4 2 (g/everywhere 42))]
+      (is (= #emlyn/grid [[42 42 42 42]
+                          [42 42 42 42]]
+             g)))))
 
 (deftest construct-without-shape-test
   (testing "Construct from string"
@@ -106,7 +118,8 @@
   (is (thrown? IllegalArgumentException (g/grid 2 3 [1 2 3 4])))
   (is (thrown? IllegalArgumentException (g/grid {[1 -1] 3})))
   (is (thrown? IllegalArgumentException (g/grid {1 {-1 3}})))
-  (is (thrown? IllegalArgumentException (g/grid 4 2 (repeat 42)))))
+  (is (thrown? IllegalArgumentException (g/grid 4 2 (repeat 42))))
+  (is (thrown? IllegalArgumentException (g/grid (g/everywhere 42)))))
 
 (deftest get-test
  (let [g #emlyn/grid [[1 2 3 4]
@@ -172,7 +185,11 @@
                g))
         (is (= #emlyn/grid [[nil 7 3]
                             [nil 8 6]]
-               (dissoc g [0 []])))))
+               (dissoc g [0 []]))))
+      (let [g (assoc g [[] 1] (g/everywhere 9))]
+        (is (= #emlyn/grid [[1 2 3]
+                            [9 9 9]]
+               g))))
     (testing "Assoc 2D grid of values"
       (let [g (assoc g [[1 3] [0 2]] [[7 8] [9 0]])]
         (is (= #emlyn/grid [[1 7 8]
@@ -180,7 +197,10 @@
                g))
         (is (= #emlyn/grid [[nil nil 8]
                             [nil nil 0]]
-               (dissoc g [[0 2] []])))))))
+               (dissoc g [[0 2] []])))
+        (is (= #emlyn/grid [[2 2 8]
+                            [2 2 0]]
+               (assoc g [[0 2] []] (g/everywhere 2))))))))
 
 (deftest convert-test
   (let [g #emlyn/grid [[1 2 nil] [4 nil 6]]]

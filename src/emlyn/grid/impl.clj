@@ -1,7 +1,9 @@
 (ns emlyn.grid.impl
   {:clj-kondo/config '{:lint-as {potemkin/def-map-type clojure.core/deftype}}}
-  (:require [clojure.string :as str]
-            [potemkin :refer [def-map-type]]))
+  (:require [emlyn.grid.everywhere]
+            [clojure.string :as str]
+            [potemkin :refer [def-map-type]])
+  (:import [emlyn.grid.everywhere Everywhere]))
 
 (defn- pos->index
   "Get the index of a position in a grid."
@@ -70,10 +72,14 @@
            (cond
              (nil? i) (throw (IndexOutOfBoundsException.))
              (int? i) (Grid. shape (assoc cells i val))
-             (seq? i) (Grid. shape (reduce (fn [c [i v]]
-                                             (assoc c i v))
-                                           cells
-                                           (map vector i (concat val (repeat nil)))))
+             (seq? i) (Grid. shape (if (instance? Everywhere val)
+                                     (reduce #(assoc %1 %2 (val nil))
+                                             cells
+                                             i)
+                                     (reduce (fn [c [i v]]
+                                               (assoc c i v))
+                                             cells
+                                             (map vector i (concat val (repeat nil))))))
              :else    (let [[w h d] i
                             g (grid w h val)]
                         (Grid. shape
@@ -136,6 +142,9 @@
     ;; Unspecified data gets filled with nil
     (nil? data)
     (into [] (repeat (* w h) nil))
+
+    (instance? Everywhere data)
+    (into [] (repeat (* w h) (data nil)))
 
     (instance? Grid data)
     (if (= [w h] (.shape data))
