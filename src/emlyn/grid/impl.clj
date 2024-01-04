@@ -1,4 +1,4 @@
-(ns emlyn.grid.type
+(ns emlyn.grid.impl
   {:clj-kondo/config '{:lint-as {potemkin/def-map-type clojure.core/deftype}}}
   (:require [clojure.string :as str]
             [potemkin :refer [def-map-type]]))

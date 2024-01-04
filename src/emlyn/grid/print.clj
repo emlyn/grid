@@ -1,8 +1,8 @@
 (ns emlyn.grid.print
-  (:require [emlyn.grid.type]
+  (:require [emlyn.grid.impl]
             [emlyn.grid.convert :refer [to-vecs]]
             [clojure.pprint])
-  (:import [emlyn.grid.type Grid]))
+  (:import [emlyn.grid.impl Grid]))
 
 (defmethod print-method Grid [grid writer]
   (print-method (to-vecs grid) writer))

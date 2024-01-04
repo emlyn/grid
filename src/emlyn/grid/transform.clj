@@ -1,5 +1,5 @@
 (ns emlyn.grid.transform
-  (:require [emlyn.grid.type :as g :refer [->Grid]]))
+  (:require [emlyn.grid.impl :as g :refer [->Grid]]))
 
 (defn add-rows
   [grid & {:keys [num pos] :or {num 1}}]

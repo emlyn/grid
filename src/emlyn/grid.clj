@@ -1,12 +1,12 @@
 (ns emlyn.grid
   (:require [potemkin :refer [import-vars]]
-            [emlyn.grid.type]
+            [emlyn.grid.impl]
             [emlyn.grid.convert]
             [emlyn.grid.transform]
             [emlyn.grid.print]))
 
 (import-vars
-  [emlyn.grid.type
+  [emlyn.grid.impl
     grid
     width
     height]

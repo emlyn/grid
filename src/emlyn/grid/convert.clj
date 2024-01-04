@@ -1,5 +1,5 @@
 (ns emlyn.grid.convert
-  (:require [emlyn.grid.type :refer [width]]))
+  (:require [emlyn.grid.impl :refer [width]]))
 
 (defn to-vec
   "Convert the grid to a flat vector of all values (left to right, top to bottom)."
