@@ -114,6 +114,11 @@
    (testing "Get a single value"
      (is (= 1 (g [0 0]) (get g [0 0])))
      (is (= 2 (g [3 2]) (get g [3 2]))))
+   (testing "Getting a missing value"
+     (is (nil? (g [0 4])))
+     (is (nil? (get g [0 4])))
+     (is (= :default (g [0 4] :default)))
+     (is (= :default (get g [0 4] :default))))
    (testing "Get a 1D slice"
      (is (= [1 2 3 4]
             (g [[0 4] 0])
