@@ -105,7 +105,8 @@
   (is (thrown? IllegalArgumentException (g/grid [1 2 3 4])))
   (is (thrown? IllegalArgumentException (g/grid 2 3 [1 2 3 4])))
   (is (thrown? IllegalArgumentException (g/grid {[1 -1] 3})))
-  (is (thrown? IllegalArgumentException (g/grid {1 {-1 3}}))))
+  (is (thrown? IllegalArgumentException (g/grid {1 {-1 3}})))
+  (is (thrown? IllegalArgumentException (g/grid 4 2 (repeat 42)))))
 
 (deftest get-test
  (let [g #emlyn/grid [[1 2 3 4]

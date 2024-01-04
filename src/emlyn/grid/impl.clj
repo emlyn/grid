@@ -105,6 +105,11 @@
   [grid]
   (second (.shape grid)))
 
+(defn- count=
+  "Check if a collection is a certain size without realizing too much of it (e.g. if it's infinite)."
+  [n col]
+  (= n (count (take (inc n) col))))
+
 (defn- infer-shape
   "Infer the shape of a grid from its init data."
   [data]
@@ -173,9 +178,9 @@
       (cond
         ;; A sequence of sequences, or a newline-separated string
         (and (sequential? split-data)
-             (every? #(or (sequential? %) (string? %)) split-data))
-        (reduce into
-                []
+             (every? #(or (sequential? %) (string? %))
+                     (take h split-data)))
+        (reduce into []
                 (take h
                       (concat (map #(take w (concat % (repeat nil))) split-data)
                               (repeat (repeat w nil)))))
@@ -183,7 +188,7 @@
         ;; Finally a flat sequence of values of exactly the right length.
         ;; This must be last, as it mustn't take precedence over seq-of-seqs.
         (and (or (sequential? data) (string? data))
-             (= (* w h) (count data)))
+             (count= (* w h) data))
         (vec data)
 
         :else
