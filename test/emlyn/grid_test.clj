@@ -39,16 +39,29 @@
       (is (= 1 (g [0 0])))
       (is (= [ 1 nil 3
               nil 2  4] (vals g)))))
-  (testing "Construct from shape and map of maps"
-    (let [g (g/grid 3 2 {0 {0 1}
+  (testing "Construct from shape and associativess"
+    (let [g (g/grid 2 3 {0 {0 1}
                          1 {1 2}
                          2 {0 3
                             1 4}})]
-      (is (= 3 (g/width g)))
-      (is (= 2 (g/height g)))
+      (is (= 2 (g/width g)))
+      (is (= 3 (g/height g)))
       (is (= 1 (g [0 0])))
-      (is (= [1 nil 3
-              nil 2 4] (vals g)))))
+      (is (= [1 nil
+              nil 2
+              3 4] (vals g)))
+      (is (= (g/grid 2 3 [[1 nil]
+                          [nil 2]
+                          [3 4]])
+             g))
+      (is (= (g/grid 2 3 {0 [1]
+                          1 [nil 2]
+                          2 [3 4]})
+       g))
+      (is (= (g/grid 2 3 [{0 1}
+                          {1 2}
+                          {0 3, 1 4}])
+       g))))
   (testing "Construct from shape and grid"
     (let [g (g/grid 3 3 (g/grid 4 2 [[1 2 3 4]
                                      [5 6 7 8]]))]
@@ -96,22 +109,30 @@
                             [2 0] 3
                             [2 1] 4}]
         (is (= g g2)))))
-  (testing "Construct from map of maps"
-    (let [g (g/grid 3 2 {0 {0 1}
-                         1 {1 2}
-                         2 {0 3
-                            1 4}})]
-      (is (= 3 (g/width g)))
-      (is (= 2 (g/height g)))
+  (testing "Construct from associatives"
+    (let [g (g/grid {0 {0 1}
+                     1 {1 2}
+                     2 {0 3
+                        1 4}})]
+      (is (= 2 (g/width g)))
+      (is (= 3 (g/height g)))
       (is (= 1 (g [0 0])))
-      (is (= #emlyn/grid [[1 nil 3]
-                          [nil 2 4]]
+      (is (= [1 nil
+              nil 2
+              3 4]
+             (vals g)))
+      (is (= (g/grid [[1 nil]
+                      [nil 2]
+                      [3 4]])
              g))
-      (let [g2 #emlyn/grid {0 {0 1}
-                            1 {1 2}
-                            2 {0 3
-                               1 4}}]
-        (is (= g g2))))))
+      (is (= (g/grid {0 [1]
+                      1 [nil 2]
+                      2 [3 4]})
+             g))
+      (is (= (g/grid [{0 1}
+                      {1 2}
+                      {0 3, 1 4}])
+             g)))))
 
 (deftest construct-error-test
   (is (thrown? IllegalArgumentException (g/grid "123\n45")))

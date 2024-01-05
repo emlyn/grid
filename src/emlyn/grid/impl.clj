@@ -47,13 +47,18 @@
                      (= 2 (count %))
                      (every? nat-int? %)) (keys data))))
 
-(defn mapmap-data?
-  "Is the init data a valid map of x to map of y to value?"
+(defn- associative-data?
+  "Is the init data a valid associative (map or vector) of y to associative of x to value?"
   [data]
-  (and (map? data)
-       (every? nat-int? (keys data))
-       (every? #(and (map? %)
-                     (every? nat-int? (keys %))) (vals data))))
+  (and (associative? data)
+       (or (vector? data)
+           (every? nat-int? (keys data)))
+       (every? #(and (associative? %)
+                     (or (vector? %)
+                         (every? nat-int? (keys %))))
+               (if (vector? data)
+                 data
+                 (vals data)))))
 
 (declare grid)
 
@@ -131,9 +136,16 @@
          (reduce (partial map max) [-1 -1])
          (mapv inc))
 
-    (mapmap-data? data)
-    [(inc (apply max -1 (keys data)))
-     (inc (apply max -1 (mapcat keys (vals data))))]))
+    (associative-data? data)
+    [(apply max 0 (map #(if (vector? %)
+                          (count %)
+                          (inc (apply max -1 (keys %))))
+                       (if (vector? data)
+                         data
+                         (vals data))))
+     (if (vector? data)
+       (count data)
+       (inc (apply max -1 (keys data))))]))
 
 (defn- massage
   "Massage init data into a vector of cells."
@@ -159,7 +171,7 @@
     (fn? data)
     (mapv (partial apply data) (shape->keys [w h]))
 
-    ;; Map of coordinate to value
+    ;; Map of xy coordinate to value
     (map-data? data)
     (reduce-kv (fn [cells pos val]
                  (if-let [i (pos->index [w h] pos)]
@@ -168,15 +180,15 @@
                (into [] (repeat (* w h) nil))
                data)
 
-    ;; Map of x to map of y to value
-    (mapmap-data? data)
-    (reduce-kv (fn [cells x ymap]
-                 (reduce-kv (fn [cells y val]
+    ;; Associative of y to associative of x to value
+    (associative-data? data)
+    (reduce-kv (fn [cells y xval]
+                 (reduce-kv (fn [cells x val]
                               (if-let [i (pos->index [w h] [x y])]
                                 (assoc cells i val)
                                 cells))
                             cells
-                            ymap))
+                            xval))
                (into [] (repeat (* w h) nil))
                data)
 
