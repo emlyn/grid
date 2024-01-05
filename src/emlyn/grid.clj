@@ -33,4 +33,7 @@
     flip-lr
     flip-tb
     concat-lr
-    concat-tb])
+    concat-tb]
+  [emlyn.grid.print
+    print-table
+    table-str])

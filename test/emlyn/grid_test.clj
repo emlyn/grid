@@ -1,5 +1,6 @@
 (ns emlyn.grid-test
   (:require [clojure.test :refer [deftest testing is]]
+            [clojure.string :as str]
             [emlyn.grid :as g]))
 
 (deftest construct-with-shape-test
@@ -416,3 +417,25 @@
     (is (= "[[1 2 3] [4 5 6]]" (pr-str g)))
     (is (= "#emlyn/grid [[1 2 3] [4 5 6]]"
            (binding [*print-dup* true] (pr-str g))))))
+
+(deftest table-test
+  (let [g #emlyn/grid [["x" 1 2]
+                       ["yyy" 10 200]]]
+    (is (= ["  x| 1|  2"
+            "yyy|10|200"]
+           (str/split-lines (g/table-str g))))
+    (is (= ["x   1  2  "
+            "yyy 10 200"]
+           (str/split-lines (g/table-str g :style :space :align :left))))
+    (is (= ["/-----+----+-----\\"
+            "|   x |  1 |   2 |"
+            "+-----+----+-----+"
+            "| yyy | 10 | 200 |"
+            "\\-----+----+-----/"]
+            (str/split-lines (g/table-str g :style :ascii :pad 1))))
+    (is (= ["╔═════╦════╦═════╗"
+            "║  x  ║  1 ║  2  ║"
+            "╠═════╬════╬═════╣"
+            "║ yyy ║ 10 ║ 200 ║"
+            "╚═════╩════╩═════╝"]
+           (str/split-lines (g/table-str g :style :double :align :centre :pad 1))))))
