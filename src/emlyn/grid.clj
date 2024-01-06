@@ -2,8 +2,9 @@
   (:require [potemkin :refer [import-vars]]
             [emlyn.grid.impl]
             [emlyn.grid.everywhere]
+            [emlyn.grid.operations]
+            [emlyn.grid.transforms]
             [emlyn.grid.convert]
-            [emlyn.grid.transform]
             [emlyn.grid.print]))
 
 (import-vars
@@ -13,27 +14,27 @@
     height]
   [emlyn.grid.everywhere
     everywhere]
-  [emlyn.grid.convert
-    as-rows
-    to-vec
-    to-vecs
-    to-map
-    to-maps]
-  [emlyn.grid.transform
+  [emlyn.grid.operations
     add-rows
     add-cols
     drop-rows
     drop-cols
     map-vals
     map-kv
+    concat-lr
+    concat-tb]
+  [emlyn.grid.transforms
     transpose
     rotate-right
     rotate-left
     rotate-180
     flip-lr
-    flip-tb
-    concat-lr
-    concat-tb]
+    flip-tb]
+  [emlyn.grid.convert
+    to-vec
+    to-vecs
+    to-map
+    to-maps]
   [emlyn.grid.print
     print-table
     table-str])

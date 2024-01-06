@@ -14,12 +14,6 @@
     (mapv #(subvec cells % (+ % w))
           (range 0 (count cells) w))))
 
-(defn ^{:deprecated "0.2.0"
-        :superseded-by "to-vecs"} as-rows
-  "DEPRECATED: Use `to-vecs` instead."
-  [grid]
-  (to-vecs grid))
-
 (defn to-map
   "Convert the grid to a plain map of coordinate to value."
   [grid & {:keys [filter] :or {filter some?}}]
