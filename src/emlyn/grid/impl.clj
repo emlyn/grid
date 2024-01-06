@@ -118,17 +118,22 @@
 
 (defn- count=
   "Check if a collection is a certain size without realizing too much of it (e.g. if it's infinite)."
-  [n col]
-  (= n (count (take (inc n) col))))
+  [coll n]
+  (= n (count (take (inc n) coll))))
 
 (defn- infer-shape
   "Infer the shape of a grid from its init data."
   [data]
   (cond
+    (instance? Grid data)
+    (.shape data)
+
+    (string? data)
+    (recur (str/split-lines data))
+
     (and (sequential? data)
-         (every? #(or (sequential? %) (string? %)) data)
-         (or (empty? data) (apply = (map count data))))
-    [(count (first data))
+         (every? #(or (sequential? %) (string? %)) data))
+    [(apply max 0 (map count data))
      (count data)]
 
     (map-data? data)
@@ -155,14 +160,32 @@
     (nil? data)
     (into [] (repeat (* w h) nil))
 
+    (string? data)
+    (let [lines (str/split-lines data)]
+      (cond
+        (> (count lines) 1)      (recur w h lines)
+        (= (* w h) (count data)) (vec data)
+        (= h 1)                  (recur w h lines)
+        :else
+        (throw (IllegalArgumentException. "Invalid init data."))))
+
     (instance? Everywhere data)
     (into [] (repeat (* w h) (data nil)))
 
     (instance? Grid data)
-    (if (= [w h] (.shape data))
+    (cond
+      (= [w h] (.shape data))
       (.cells data)
-      (reduce into
-              []
+
+      (and (= w (width data))
+           (< h (height data)))
+      (subvec (.cells data) 0 (* w h))
+
+      (= w (width data))
+      (into (.cells data) (repeat (* w (- h (height data))) nil))
+
+      :else
+      (reduce into []
               (take h
                     (concat (map #(take w (concat % (repeat nil))) (partition (first (.shape data)) (.cells data)))
                             (repeat (repeat w nil))))))
@@ -192,39 +215,37 @@
                (into [] (repeat (* w h) nil))
                data)
 
+    ;; A flat sequence of strings of exactly the right length
+    (and (sequential? data)
+         (count= data (* w h))
+         (every? string? data))
+    (vec data)
+
+    ;; A sequence of sequences or strings
+    (and (sequential? data)
+         (every? #(or (sequential? %) (string? %))
+                 (take h data)))
+    (reduce into []
+            (take h
+                  (concat (map #(take w (concat % (repeat nil))) data)
+                          (repeat (repeat w nil)))))
+
+    ;; Finally a flat sequence of values of exactly the right length.
+    ;; This must be last, as it mustn't take precedence over seq-of-seqs
+    ;; if the values themselves are sequential.
+    (and (sequential? data)
+         (count= data (* w h)))
+    (vec data)
+
     :else
-    (let [split-data (if (string? data)
-                       (str/split-lines data)
-                       data)]
-      (cond
-        ;; A sequence of sequences, or a newline-separated string
-        (and (sequential? split-data)
-             (every? #(or (sequential? %) (string? %))
-                     (take h split-data)))
-        (reduce into []
-                (take h
-                      (concat (map #(take w (concat % (repeat nil))) split-data)
-                              (repeat (repeat w nil)))))
-
-        ;; Finally a flat sequence of values of exactly the right length.
-        ;; This must be last, as it mustn't take precedence over seq-of-seqs.
-        (and (or (sequential? data) (string? data))
-             (count= (* w h) data))
-        (vec data)
-
-        :else
-        (throw (IllegalArgumentException. "Invalid init data."))))))
+    (throw (IllegalArgumentException. "Invalid init data."))))
 
 (defn grid
   "Construct a grid."
   ([data]
-   (cond
-     (instance? Grid data) data
-     (string? data) (grid (str/split-lines data))
-     :else
-     (if-let [[w h] (infer-shape data)]
-       (grid w h data)
-       (throw (IllegalArgumentException.
-               "Unable to infer shape from init data.")))))
+   (if-let [[w h] (infer-shape data)]
+     (grid w h data)
+     (throw (IllegalArgumentException.
+             "Unable to infer shape from init data."))))
   ([w h & [data]]
    (->Grid [w h] (massage w h data))))

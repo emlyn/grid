@@ -15,13 +15,23 @@
       (is (= 2 (g/width g)))
       (is (= 3 (g/height g)))
       (is (= 1 (g [0 0])))
-      (is (= (range 1 7) (vals g)))))
+      (is (= (range 1 7) (vals g))))
+    (let [g (g/grid 3 2 ["a" "b" "c" "d" "e" "f"])]
+      (is (= ["a" "b" "c"
+              "d" "e" "f"]
+             (vals g)))))
   (testing "Construct from shape and function"
     (let [g (g/grid 4 4 *)]
       (is (= (g/grid [[0 0 0 0]
                       [0 1 2 3]
                       [0 2 4 6]
                       [0 3 6 9]])
+             g))))
+  (testing "Construct from infinite seqs"
+    (let [g (g/grid 4 3 (repeat (range)))]
+      (is (= (g/grid [[0 1 2 3]
+                      [0 1 2 3]
+                      [0 1 2 3]])
              g))))
   (testing "Construct from shape and vectors"
     (let [g (g/grid 2 3 [[1 2] [3 4] [5 6]])]
@@ -84,7 +94,12 @@
       (is (= \l (g [2 3])))
       (is (nil? (g [3 0])))
       (let [g2 #emlyn/grid "abc\ndef\nghi\njkl"]
-        (is (= g g2)))))
+        (is (= g g2))))
+    (let [g (g/grid "a\nbc\ndef")]
+      (is (= [\a nil nil
+              \b \c nil
+              \d \e \f]
+             (vals g)))))
   (testing "Construct from vectors"
     (let [g (g/grid [[1 2] [3 4] [5 6]])]
       (is (= 2 (g/width g)))
@@ -135,7 +150,6 @@
              g)))))
 
 (deftest construct-error-test
-  (is (thrown? IllegalArgumentException (g/grid "123\n45")))
   (is (thrown? IllegalArgumentException (g/grid [1 2 3 4])))
   (is (thrown? IllegalArgumentException (g/grid 2 3 [1 2 3 4])))
   (is (thrown? IllegalArgumentException (g/grid {[1 -1] 3})))
