@@ -238,6 +238,29 @@
                             [2 2 0]]
                (assoc g [[0 2] []] (g/everywhere 2))))))))
 
+(deftest index-mode-test
+  (let [g #emlyn/grid [[1 2 3]
+                       [4 5 6]]]
+    (is (= 0 (g [-1 0] 0)))
+    (is (= 3 (g/with-index-mode :python (g [-1 0] 0))))
+    (is (= 3 (g/with-index-mode :wrap   (g [-1 0] 0))))
+    (is (= 1 (g/with-index-mode :clamp  (g [-1 0] 0))))
+    (is (= 0 (g [-4 0] 0)))
+    (is (= 0 (g/with-index-mode :python (g [-4 0] 0))))
+    (is (= 3 (g/with-index-mode :wrap   (g [-4 0] 0))))
+    (is (= 1 (g/with-index-mode :clamp  (g [-4 0] 0))))
+    (is (= 0 (g [1 2] 0)))
+    (is (= 0 (g/with-index-mode :python (g [1 2] 0))))
+    (is (= 2 (g/with-index-mode :wrap   (g [1 2] 0))))
+    (is (= 5 (g/with-index-mode :clamp  (g [1 2] 0))))
+    (is (thrown? IndexOutOfBoundsException (assoc g [-1 0] 0)))
+    (is (= #emlyn/grid [[1 2 0]
+                        [4 5 6]]
+           (g/with-index-mode :python (assoc g [-1 0] 0))))
+    (is (= #emlyn/grid [[0 2 3]
+                        [4 5 6]]
+           (g/with-index-mode :clamp (assoc g [-1 0] 0))))))
+
 (deftest convert-test
   (let [g #emlyn/grid [[1 2 nil] [4 nil 6]]]
     (is (= [1 2 nil

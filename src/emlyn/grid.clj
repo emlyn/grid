@@ -11,7 +11,9 @@
   [emlyn.grid.impl
     grid
     width
-    height]
+    height
+    with-index-mode
+    set-index-mode!]
   [emlyn.grid.everywhere
     everywhere]
   [emlyn.grid.operations

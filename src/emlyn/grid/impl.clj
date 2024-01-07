@@ -5,12 +5,40 @@
             [potemkin :refer [def-map-type]])
   (:import [emlyn.grid.everywhere Everywhere]))
 
+(def ^:dynamic *index-mode*
+  "How to handle indices outside the usual bounds. Valid values are:
+   - `:strict` (default): no special handling of indices
+   - `:wrap`: indices wrap around the edges of the grid
+   - `:clamp`: indices clamp to the edges of the grid
+   - `:python`: negative indices count from the end of the grid
+   Indices that still fall outside the grid after this handling will
+   throw an exception if you try to set (e.g. `assoc`) them,
+   and will return the default value (or `nil`) when you read them."
+  :strict)
+
+(defmacro with-index-mode [mode & body]
+  `(binding [*index-mode* ~mode]
+     ~@body))
+
+(defn set-index-mode!
+  [mode]
+  (alter-var-root #'*index-mode* (constantly mode)))
+
 (defn- pos->index
   "Get the index of a position in a grid."
   [[w h] [x y]]
-  (when (and (< -1 x w)
-             (< -1 y h))
-    (+ x (* w y))))
+  (let [[x y]
+        (case *index-mode*
+          :python [(if (neg? x) (+ w x) x)
+                   (if (neg? y) (+ h y) y)]
+          :wrap [(mod x w)
+                 (mod y h)]
+          :clamp [(max 0 (min x (dec w)))
+                  (max 0 (min y (dec h)))]
+          [x y])]
+    (when (and (< -1 x w)
+               (< -1 y h))
+      (+ x (* w y)))))
 
 (defn slice->range
   ([limit] (range limit))
