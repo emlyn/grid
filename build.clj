@@ -5,7 +5,7 @@
             [deps-deploy.deps-deploy :as dd]))
 
 (def lib 'com.github.emlyn/grid)
-(def version "0.2.0")
+(def version "0.2.1-SNAPSHOT")
 (def class-dir "target/classes")
 
 (defn test "Run all the tests." [opts]
