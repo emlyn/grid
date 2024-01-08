@@ -262,19 +262,26 @@
            (g/with-index-mode :clamp (assoc g [-1 0] 0))))))
 
 (deftest convert-test
-  (let [g #emlyn/grid [[1 2 nil] [4 nil 6]]]
+  (let [g #emlyn/grid [[1 2 nil]
+                       [4 nil 6]]]
     (is (= [1 2 nil
-            4 nil 6] (g/to-vec g)))
+            4 nil 6]
+           (g/to-vec g)))
     (is (= [[1 2 nil]
-            [4 nil 6]] (g/to-vecs g)))
+            [4 nil 6]]
+           (g/to-vecs g)))
     (is (= {[0 0] 1
             [1 0] 2
             [0 1] 4
-            [2 1] 6} (g/to-map g)))
-    (is (= {0 {0 1
-               1 4}
+            [2 1] 6}
+           (g/to-map g)))
+    (is (= {0 {0 1, 1 2}
+            1 {0 4, 2 6}}
+           (g/to-maps g)))
+    (is (= {0 {0 1, 1 4}
             1 {0 2}
-            2 {1 6}} (g/to-maps g)))))
+            2 {1 6}}
+           (g/to-maps g :xy-order true)))))
 
 (deftest add-rows-test
   (let [g #emlyn/grid [[1 2 3]
