@@ -47,7 +47,7 @@
       (is (= 3 (g/width g)))
       (is (= 2 (g/height g)))
       (is (= 1 (g [0 0])))
-      (is (= [ 1 nil 3
+      (is (= [1 nil 3
               nil 2  4] (vals g)))))
   (testing "Construct from shape and associativess"
     (let [g (g/grid 2 3 {0 {0 1}
@@ -67,11 +67,11 @@
       (is (= (g/grid 2 3 {0 [1]
                           1 [nil 2]
                           2 [3 4]})
-       g))
+             g))
       (is (= (g/grid 2 3 [{0 1}
                           {1 2}
                           {0 3, 1 4}])
-       g))))
+             g))))
   (testing "Construct from shape and grid"
     (let [g (g/grid 3 3 (g/grid 4 2 [[1 2 3 4]
                                      [5 6 7 8]]))]
@@ -497,7 +497,7 @@
             "+-----+----+-----+"
             "| yyy | 10 | 200 |"
             "\\-----+----+-----/"]
-            (str/split-lines (g/table-str g :style :ascii :pad 1))))
+           (str/split-lines (g/table-str g :style :ascii :pad 1))))
     (is (= ["╔═════╦════╦═════╗"
             "║  x  ║  1 ║  2  ║"
             "╠═════╬════╬═════╣"
