@@ -1,5 +1,6 @@
 (ns emlyn.grid.everywhere
-  {:clj-kondo/config '{:lint-as {potemkin/def-map-type clojure.core/deftype}}}
+  {:no-doc true
+   :clj-kondo/config '{:lint-as {potemkin/def-map-type clojure.core/deftype}}}
   (:require [potemkin :refer [def-map-type]]))
 
 (def-map-type Everywhere [val]

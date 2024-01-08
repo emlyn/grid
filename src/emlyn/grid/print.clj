@@ -1,4 +1,5 @@
 (ns emlyn.grid.print
+  {:no-doc true}
   (:require [emlyn.grid.impl :as g]
             [emlyn.grid.convert :refer [to-vecs]]
             [clojure.pprint])

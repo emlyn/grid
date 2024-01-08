@@ -1,4 +1,5 @@
 (ns emlyn.grid.operations
+  {:no-doc true}
   (:require [emlyn.grid.impl :as g :refer [->Grid]]))
 
 (defn add-rows

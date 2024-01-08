@@ -1,4 +1,5 @@
 (ns emlyn.grid.convert
+  {:no-doc true}
   (:require [emlyn.grid.impl :refer [width]]))
 
 (defn to-vec

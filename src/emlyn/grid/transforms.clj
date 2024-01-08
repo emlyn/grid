@@ -1,4 +1,5 @@
 (ns emlyn.grid.transforms
+  {:no-doc true}
   (:require [emlyn.grid.impl :as g :refer [->Grid]]))
 
 (defn transpose
