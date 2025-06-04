@@ -7,7 +7,11 @@
   (:import [emlyn.grid.everywhere Everywhere]))
 
 (def ^:dynamic *index-mode*
-  "How to handle indices outside the usual bounds. Valid values are:
+  "See `with-index-mode` for valid mode values."
+  :strict)
+
+(defmacro with-index-mode
+  "How to handle indices outside the usual bounds. Valid mode values are:
    - `:strict` (default): no special handling of indices
    - `:wrap`: indices wrap around the edges of the grid
    - `:clamp`: indices clamp to the edges of the grid
@@ -15,13 +19,12 @@
    Indices that still fall outside the grid after this handling will
    throw an exception if you try to set (e.g. `assoc`) them,
    and will return the default value (or `nil`) when you read them."
-  :strict)
-
-(defmacro with-index-mode [mode & body]
+  [mode & body]
   `(binding [*index-mode* ~mode]
      ~@body))
 
 (defn set-index-mode!
+  "Permanently sets the default index mode. See `with-index-mode`"
   [mode]
   (alter-var-root #'*index-mode* (constantly mode)))
 
