@@ -1,4 +1,5 @@
 (ns emlyn.grid
+  "The Grid public API."
   (:require [potemkin :refer [import-vars]]
             [emlyn.grid.impl]
             [emlyn.grid.everywhere]
@@ -12,6 +13,8 @@
     grid
     width
     height
+    rows
+    cols
     with-index-mode
     set-index-mode!]
   [emlyn.grid.everywhere

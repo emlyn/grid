@@ -1,4 +1,5 @@
 (ns emlyn.grid.operations
+  "Operations that can be performed on a Grid."
   {:no-doc true}
   (:require [emlyn.grid.impl :as g :refer [->Grid]]))
 

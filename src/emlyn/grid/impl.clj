@@ -1,4 +1,5 @@
 (ns emlyn.grid.impl
+  "Implementation of the Grid type."
   {:no-doc true
    :clj-kondo/config '{:lint-as {potemkin/def-map-type clojure.core/deftype}}}
   (:require [emlyn.grid.everywhere]
@@ -147,6 +148,19 @@
   "The height of a grid in cells."
   [grid]
   (second (.shape grid)))
+
+(defn rows
+  "A sequence of vectors containing the values in each row of the grid."
+  [grid]
+  (map #(subvec (.cells grid)
+                (* % (width grid))
+                (* (inc %) (width grid)))
+       (range (height grid))))
+
+(defn cols
+  "A sequence of vectors containing the values in each column of the grid."
+  [grid]
+  (apply map vector (rows grid)))
 
 (defn- count=
   "Check if a collection is a certain size without realizing too much of it (e.g. if it's infinite)."

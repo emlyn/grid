@@ -5,7 +5,7 @@
   <artifactId>grid</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <name>emlyn/grid</name>
-  <description>FIXME: my new library.</description>
+  <description>A library for working with 2 dimensional data (grids).</description>
   <url>https://github.com/emlyn/grid</url>
   <licenses>
     <license>

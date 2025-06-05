@@ -11,6 +11,7 @@
 .lein-*
 .lsp/.cache
 .lsp/sqlite.db
+.clj-kondo/
 .nrepl-history
 .nrepl-port
 .portal

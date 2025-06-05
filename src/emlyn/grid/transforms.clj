@@ -1,9 +1,10 @@
 (ns emlyn.grid.transforms
+  "Functions for transforming Grids."
   {:no-doc true}
   (:require [emlyn.grid.impl :as g :refer [->Grid]]))
 
 (defn transpose
-  "Transpose a grid."
+  "Transpose a grid (reflect it around the x=y line)."
   [grid]
   (let [[h w] (.shape grid)]
     (->Grid [w h] (mapv (fn [[x y]] (grid [y x]))

@@ -1,12 +1,16 @@
 (ns emlyn.grid.print
+  "Functions for printing Grids."
   {:no-doc true}
   (:require [emlyn.grid.impl :as g]
             [emlyn.grid.convert :refer [to-vecs]]
             [clojure.pprint])
   (:import [emlyn.grid.impl Grid]))
 
+(def ^:dynamic *print-fn* nil)
+
 (defmethod print-method Grid [grid writer]
-  (print-method (to-vecs grid) writer))
+  (let [print-fn (or *print-fn* #(print-method (to-vecs %1) %2))]
+    (print-fn grid writer)))
 
 (defmethod print-dup Grid [grid writer]
   (.write writer "#emlyn/grid ")
@@ -29,6 +33,8 @@
    {[2 1] " "}
    :simple
    {[2 1] "|"}
+   :markdown
+   {1 ["| " nil " | " " |"]}
    :single
    [["┌" "─" "┬" "┐"]
     ["│" nil "│" "│"]
@@ -92,20 +98,28 @@
                          widths))))
 
 (defn print-table
-  "Print a grid as a table."
-  [grid & {:keys [style]
+  "Print a grid as a table.
+
+   ```
+   (print-table grid :style :markdown :pad 1)
+   ```"
+  [grid & {:keys [style pad align]
            :or {style :simple}
            :as opts}]
-  (let [widths (map (fn [x]
+  (let [widths (map (fn [col]
                       (apply max 0 (map #(cell-width % opts)
-                                        (grid [x []]))))
-                    (range (g/width grid)))
+                                        col)))
+                    (g/cols grid))
         seps (g/grid 4 4 (get table-styles style style))]
     (print-border (seps [[] 0]) widths opts)
-    (dotimes [y (g/height grid)]
-      (when (pos? y)
-        (print-border (seps [[] 2]) widths opts))
-      (print-row (seps [[] 1]) (map #(format-cell %1 %2 opts) (grid [[] y]) widths)))
+    (when (pos? (g/height grid))
+      (loop [[row & more] (g/rows grid)
+             first? true]
+        (when-not first?
+          (print-border (seps [[] 2]) widths opts))
+        (print-row (seps [[] 1]) (map #(format-cell %1 %2 opts) row widths))
+        (when more
+          (recur more false))))
     (print-border (seps [[] 3]) widths opts)))
 
 (defn table-str

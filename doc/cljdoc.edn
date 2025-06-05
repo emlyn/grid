@@ -1,0 +1,12 @@
+{:cljdoc.doc/tree
+ [["Readme" {:file "README.md"}]
+  ["Changes" {:file "CHANGELOG.md"}]
+  ["Usage" {:file "doc/usage.md"}
+   ["Installing" {:file "doc/installing.md"}]
+   ["Constructing grids" {:file "doc/constructing.md"}]
+   ["Getting and setting" {:file "doc/getting.md"}]
+   ["Grid operations" {:file "doc/operations.md"}]
+   ["Grid transforms" {:file "doc/transforms.md"}]
+   ["Converting grids" {:file "doc/converting.md"}]
+   ["Displaying grids" {:file "doc/displaying.md"}]]
+  ["Contributing" {:file "doc/contributing.md"}]]}
