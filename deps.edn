@@ -1,6 +1,6 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        potemkin/potemkin {:mvn/version "0.4.6"}}
+ :deps {org.clojure/clojure {:mvn/version "1.12.1"}
+        potemkin/potemkin {:mvn/version "0.4.7"}}
  :aliases
  {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.4"}
                  slipset/deps-deploy {:mvn/version "0.2.1"}}
