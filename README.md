@@ -6,7 +6,7 @@ A library for working with 2D rectangular arrays of data.
 
 ## Documentation
 
-[Project documentation](https://cljdoc.org/d/com.github.emlyn/grid) can be found on Clojars.
+[Project documentation](https://cljdoc.org/d/com.github.emlyn/grid) can be found on cljdoc.
 
 ## Usage
 
