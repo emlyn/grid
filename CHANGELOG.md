@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Improved documentation
+- Improved printing, print grids as a table by default
 - Add `rows` and `cols` functions to return grid as a sequence of (vector) rows or columns.
 
 ## [0.2.1] - 2023-12-26

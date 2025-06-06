@@ -41,5 +41,7 @@
     to-map
     to-maps]
   [emlyn.grid.print
+    with-print-opts
+    merge-print-opts!
     print-table
     table-str])

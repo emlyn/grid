@@ -3,38 +3,49 @@
   {:no-doc true}
   (:require [emlyn.grid.impl :as g]
             [emlyn.grid.convert :refer [to-vecs]]
-            [clojure.pprint])
+            [emlyn.grid.everywhere :refer [everywhere]]
+            [clojure.pprint]
+            [clojure.java.io :as io])
   (:import [emlyn.grid.impl Grid]))
 
-(def ^:dynamic *print-fn* nil)
+(def ^:dynamic *print-opts*
+  {:style :markdown
+   :pad 1
+   :align :right
+   :truncate true
+   :max-cols 10
+   :max-rows 20
+   :overflow-val "..."})
 
-(defmethod print-method Grid [grid writer]
-  (let [print-fn (or *print-fn* #(print-method (to-vecs %1) %2))]
-    (print-fn grid writer)))
+(defmacro with-print-opts
+  "Temporarily set the default options for printing tables. Options are:
+   - `:style` - the style of table to print (default `:markdown`)
+   - `:pad` - padding around each cell (default 1)
+   - `:align` - alignment of cell values, one of `:left`, `:right`, or `:centre` (default `:right`)
+   - `:truncate` - whether to truncate the table to a maximum number of rows and columns (default true)
+   - `:max-cols` - maximum number of columns in the table (default 8)
+   - `:max-rows` - maximum number of rows in the table (default 16)
+   - `:overflow-val` - value to use for cells that overflow the grid (default \"...\")"
+  [opts & body]
+  `(binding [*print-opts* (merge *print-opts* ~opts)]
+     ~@body))
 
-(defmethod print-dup Grid [grid writer]
-  (.write writer "#emlyn/grid ")
-  ;; By default, to-vecs creates subvectors, which print differently,
-  ;; so convert them to plain vectors for printing:
-  (print-dup (mapv #(into [] %)
-                   (to-vecs grid))
-             writer))
-
-(defn pprint-grid
-  [grid]
-  (clojure.pprint/pprint (to-vecs grid)))
-
-(. clojure.pprint/simple-dispatch addMethod Grid pprint-grid)
+(defn merge-print-opts!
+  "Permanently merge the given options with the current print options."
+  [& {:as opts}]
+  (alter-var-root #'*print-opts* #(merge % opts)))
 
 (def table-styles
-  {:tight
+  {:vec
+   (fn [g] (vec (g/rows g)))
+   :tight
    {}
    :space
    {[2 1] " "}
    :simple
    {[2 1] "|"}
    :markdown
-   {1 ["| " nil " | " " |"]}
+   {1 ["|" nil "|" "|"]}
    :single
    [["┌" "─" "┬" "┐"]
     ["│" nil "│" "│"]
@@ -80,50 +91,105 @@
 
 (defn cell-width
   "Get the width a value will be as a table cell (without counting padding)."
-  [val & {:as opts}]
-  (count (format-cell val 0 (assoc opts :pad 0))))
+  [val & {:keys [raw]}]
+  (count (if raw (pr-str val) (str val))))
 
-(defn print-row
+(defn write-row
   "Print a row of the table given a sequence of formatted cell values."
-  [[leader _ divider trailer] vals]
-  (println (str leader
-                (apply str (interpose divider vals))
-                trailer)))
+  [[leader _ divider trailer] vals nl writer]
+  (.write writer
+          (str (when nl \newline)
+               leader
+               (apply str (interpose divider vals))
+               trailer))
+  true)
 
-(defn print-border
+(defn write-border
   "Print a horizontal border of the table if there is one."
-  [[_ line-char :as seps] widths {:keys [pad] :or {pad 0}}]
+  [[_ line-char :as seps] widths nl {:keys [pad writer] :or {pad 0}}]
   (when (some identity seps)
-    (print-row seps (map #(apply str (repeat (+ pad % pad) line-char))
-                         widths))))
+    (write-row seps
+               (map #(apply str (repeat (+ pad % pad) line-char))
+                    widths)
+               nl
+               writer)))
+
+(defn truncate-grid
+  "Truncate a grid to a maximum number of rows and columns, replacing
+   overflow values with `overflow-val`."
+  [grid max-cols max-rows overflow-val]
+  (let [ncols (g/width grid)
+        nrows (g/height grid)]
+    (case [(boolean (and max-cols (pos? max-cols) (> ncols max-cols)))
+           (boolean (and max-rows (pos? max-rows) (> nrows max-rows)))]
+      [false false] grid
+      [false true] (assoc (g/grid ncols max-rows grid)
+                          [[] (dec max-rows)] (everywhere overflow-val))
+      [true false] (assoc (g/grid max-cols nrows grid)
+                          [(dec max-cols) []] (everywhere overflow-val))
+      [true true] (-> (g/grid max-cols max-rows grid)
+                      (assoc [[] (dec max-rows)] (everywhere overflow-val))
+                      (assoc [(dec max-cols) []] (everywhere overflow-val))))))
+
+(defn write-table
+  [grid & {:as opts}]
+  (let [{:keys [style truncate max-cols max-rows overflow-val writer]
+         :as opts} (merge *print-opts* opts)
+        grid (if truncate (truncate-grid grid max-cols max-rows overflow-val) grid)
+        style (get table-styles style style)
+        style (or style (table-styles :basic))]
+    (if (fn? style)
+      (print-method (style grid) writer)
+      (let [widths (map (fn [col]
+                          (apply max 0 (map #(cell-width % opts)
+                                            col)))
+                        (g/cols grid))
+            seps (g/grid 4 4 style)
+            started (write-border (seps [[] 0]) widths false opts)]
+        (when (pos? (g/height grid))
+          (loop [[row & more] (g/rows grid)
+                 first? true]
+            (when-not first?
+              (write-border (seps [[] 2]) widths true opts))
+            (write-row (seps [[] 1]) (map #(format-cell %1 %2 opts) row widths) (or started (not first?)) writer)
+            (when more
+              (recur more false))))
+        (write-border (seps [[] 3]) widths true opts)))))
 
 (defn print-table
   "Print a grid as a table.
 
    ```
-   (print-table grid :style :markdown :pad 1)
+   (print-table grid :style :rounded)
    ```"
-  [grid & {:keys [style pad align]
-           :or {style :simple}
+  [grid & {:keys [writer]
+           :or {writer *out*}
            :as opts}]
-  (let [widths (map (fn [col]
-                      (apply max 0 (map #(cell-width % opts)
-                                        col)))
-                    (g/cols grid))
-        seps (g/grid 4 4 (get table-styles style style))]
-    (print-border (seps [[] 0]) widths opts)
-    (when (pos? (g/height grid))
-      (loop [[row & more] (g/rows grid)
-             first? true]
-        (when-not first?
-          (print-border (seps [[] 2]) widths opts))
-        (print-row (seps [[] 1]) (map #(format-cell %1 %2 opts) row widths))
-        (when more
-          (recur more false))))
-    (print-border (seps [[] 3]) widths opts)))
+  (write-table grid :writer writer opts)
+  (.write writer "\n"))
 
 (defn table-str
   "Return a string containing a grid formatted as a table."
   [grid & {:as opts}]
-  (with-out-str
-    (print-table grid opts)))
+  (with-open [sw (java.io.StringWriter.)
+              w (io/writer sw)]
+    (write-table grid :writer w opts)
+    (.flush w)
+    (str sw)))
+
+(defmethod print-method Grid [grid writer]
+  (write-table grid :writer writer))
+
+(defmethod print-dup Grid [grid writer]
+  (.write writer "#emlyn/grid ")
+  ;; By default, to-vecs creates subvectors, which print differently,
+  ;; so convert them to plain vectors for printing:
+  (print-dup (mapv #(into [] %)
+                   (to-vecs grid))
+             writer))
+
+(defn pprint-grid
+  [grid]
+  (clojure.pprint/pprint (to-vecs grid)))
+
+(. clojure.pprint/simple-dispatch addMethod Grid pprint-grid)

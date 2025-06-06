@@ -47,18 +47,6 @@ Here are a few of the ways a grid can be constructed:
 #emlyn/grid [[1 2 3] [4 5 6]] ;; Construct a grid using the reader macro.
 ```
 
-You can print a grid as a text table using `print-table`:
-
-```clojure
-(def board (g/grid [[1 2 3] [4 5 6] [7 8 9]]))
-
-(g/print-table board)
-;; =>
-;; 1|2|3
-;; 4|5|6
-;; 7|8|9
-```
-
 To get or set individual values in a grid, treat it like a Clojure map with `[x y]` keys:
 
 ```clojure
@@ -67,7 +55,7 @@ To get or set individual values in a grid, treat it like a Clojure map with `[x 
 (board [1 2]) ;; => 8
 (get board [1 4] :missing) ;; => :missing
 
-(-> board (assoc [0 0] 99) g/print-table)
+(assoc board [0 0] 99)
 ;; =>
 ;; 99|2|3
 ;;  4|5|6

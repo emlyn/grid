@@ -8,7 +8,7 @@ If the lines are not of equal length, the grid will be as wide as the longest li
 with missing characters filled with `nil`.
 
 ```clojure
-(grid "hello\nworld")
+(g/grid "hello\nworld")
 ```
 ```text
 | h | e | l | l | o |
@@ -19,7 +19,7 @@ If dimensions are specified, you can leave out the newline characters.
 In this case the length of the string must exactly match the total number of cells:
 
 ```clojure
-(grid 3 3 "abcdefghi")
+(g/grid 3 3 "abcdefghi")
 ```
 ```text
 | a | b | c |
@@ -31,13 +31,16 @@ In this case the length of the string must exactly match the total number of cel
 
 You can instead supply a sequence of strings, where each string will represent one row in the grid,
 even if it contains newline characters.
+Note that newline will be printed normally, messing up the output,
+and the second row is padded with a `nil` which prints as the empty string.
 
 ```clojure
-(grid ["grid\nwith" "newlines"])
+(g/grid ["grid\nwith" "newlines"])
 ```
 ```text
-| g | r | i | d | \\n | w | i | t | h |
-| n | e | w | l | i | n | e | s | `nil` |
+| g | r | i | d |
+ | w | i | t | h |
+| n | e | w | l |  i | n | e | s |   |
 ```
 
 ## A flat sequence of values
@@ -46,11 +49,11 @@ You can specify the dimensions of the grid, and supply a sequence of any values,
 of length exactly equal to the total number of cells:
 
 ```clojure
-(grid 4 3 [1 2 3 4 2 4 6 8 3 6 9 12])
+(g/grid 4 3 [1 2 3 4 2 4 6 8 3 6 9 12])
 ```
 ```text
-| 1 | 2 | 3 | 4 |
-| 2 | 4 | 6 | 8 |
+| 1 | 2 | 3 |  4 |
+| 2 | 4 | 6 |  8 |
 | 3 | 6 | 9 | 12 |
 ```
 
@@ -60,7 +63,7 @@ You can supply a map, where the keys are vectors of 2 non-negative integers repr
 The specified coordinates will be filled with the given values, and unspecified cells will contain `nil`.
 
 ```clojure
-(grid {[1 0] 1, [0 1] 4, [2 1] 2, [1 2] 3})
+(g/grid {[1 0] 1, [0 1] 4, [2 1] 2, [1 2] 3})
 ```
 ```text
 | `nil` |   1   | `nil` |
@@ -79,8 +82,8 @@ Note however that both grids will have the same origin as there is no way to spe
 only the size of the new grid.
 
 ```clojure
-(def board (grid [[1 2 3] [4 5 6]]))
-(grid 2 2 board)
+(def board (g/grid [[1 2 3] [4 5 6]]))
+(g/grid 2 2 board)
 ```
 ```text
 | 1 | 2 |
@@ -94,7 +97,7 @@ For a more flexible way to create a subgrid from another grid, you can use slice
 If you want all cells to have the same value, you can use the `everywhere` helper:
 
 ```clojure
-(grid 2 3 (everywhere 42))
+(g/grid 2 3 (everywhere 42))
 ```
 ```text
 | 42 | 42 |
@@ -105,7 +108,7 @@ If you want all cells to have the same value, you can use the `everywhere` helpe
 ## A function
 
 ```clojure
-(grid 4 4 *)
+(g/grid 4 4 *)
 ```
 ```text
 | 0 | 0 | 0 | 0 |
