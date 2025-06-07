@@ -185,7 +185,7 @@
 
 (defmethod print-dup Grid [grid writer]
   ;; Prepend the reader macro so it reads back as the correct type:
-  (.write writer (str "#emlyn/grid " grid)))
+  (.write writer (binding [*print-dup* false] (str "#emlyn/grid " grid))))
 
 (defn pprint-grid
   [grid]

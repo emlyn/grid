@@ -477,9 +477,13 @@
                           [9 0]]
              (g/concat-tb g0 g1 g2))))))
 
+(deftest str-test
+  (let [g #emlyn/grid [[1 2 3] [4 5 6]]]
+    (is (= "[[1 2 3] [4 5 6]]" (str g)))))
+
 (deftest print-test
   (let [g #emlyn/grid [[1 2 3] [4 5 6]]]
-    (is (= "[[1 2 3] [4 5 6]]" (pr-str g)))
+    (is (= "| 1 | 2 | 3 |\n| 4 | 5 | 6 |" (pr-str g)))
     (is (= "#emlyn/grid [[1 2 3] [4 5 6]]"
            (binding [*print-dup* true] (pr-str g))))))
 
@@ -488,10 +492,10 @@
                        ["yyy" 10 200]]]
     (is (= ["  x| 1|  2"
             "yyy|10|200"]
-           (str/split-lines (g/table-str g))))
+           (str/split-lines (g/table-str g :style :simple :pad 0))))
     (is (= ["x   1  2  "
             "yyy 10 200"]
-           (str/split-lines (g/table-str g :style :space :align :left))))
+           (str/split-lines (g/table-str g :style :space :align :left :pad 0))))
     (is (= ["/-----+----+-----\\"
             "|   x |  1 |   2 |"
             "+-----+----+-----+"
