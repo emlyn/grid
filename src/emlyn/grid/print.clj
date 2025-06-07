@@ -2,7 +2,6 @@
   "Functions for printing Grids."
   {:no-doc true}
   (:require [emlyn.grid.impl :as g]
-            [emlyn.grid.convert :refer [to-vecs]]
             [emlyn.grid.everywhere :refer [everywhere]]
             [clojure.pprint]
             [clojure.java.io :as io])
