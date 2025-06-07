@@ -1,7 +1,7 @@
 (ns emlyn.grid.convert
   "Functions for converting a grid into other data structures."
   {:no-doc true}
-  (:require [emlyn.grid.impl :refer [width]]))
+  (:require [emlyn.grid.impl :refer [width rows]]))
 
 (defn to-vec
   "Convert a grid to a flat vector of all values (left to right, top to bottom).
@@ -16,17 +16,14 @@
 
 (defn to-vecs
   "Convert a grid to a vector of vectors, one for each row.
-   This is the same as calling [emlyn.grid/rows] on the grid.
+   Similar to calling [emlyn.grid/rows] on the grid.
 
    ```
    (to-vecs grid)
    ```
    "
   [grid]
-  (let [cells (.cells grid)
-        w (width grid)]
-    (mapv #(subvec cells % (+ % w))
-          (range 0 (count cells) w))))
+  (vec (rows grid)))
 
 (defn to-map
   "Convert a grid to a map of xy-coordinate to value

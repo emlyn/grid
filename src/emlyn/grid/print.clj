@@ -178,18 +178,17 @@
     (str sw)))
 
 (defmethod print-method Grid [grid writer]
-  (write-table grid :writer writer))
+  ;; At the REPL print grids as tables
+  (if *print-readably*
+    (write-table grid :writer writer)
+    (.write writer (str grid))))
 
 (defmethod print-dup Grid [grid writer]
-  (.write writer "#emlyn/grid ")
-  ;; By default, to-vecs creates subvectors, which print differently,
-  ;; so convert them to plain vectors for printing:
-  (print-dup (mapv #(into [] %)
-                   (to-vecs grid))
-             writer))
+  ;; Prepend the reader macro so it reads back as the correct type:
+  (.write writer (str "#emlyn/grid " grid)))
 
 (defn pprint-grid
   [grid]
-  (clojure.pprint/pprint (to-vecs grid)))
+  (write-table grid :writer *out*))
 
 (. clojure.pprint/simple-dispatch addMethod Grid pprint-grid)

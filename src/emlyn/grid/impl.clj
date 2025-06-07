@@ -94,6 +94,7 @@
                  (vals data)))))
 
 (declare grid)
+(declare rows)
 
 (def-map-type Grid [shape cells]
   (get [_ pos default]
@@ -137,7 +138,8 @@
   (keys [_] (shape->keys shape))
   (meta [_] (meta shape))
   (with-meta [_ m] (Grid. (with-meta shape m) cells))
-  (count [_] (apply * shape)))
+  (count [_] (apply * shape))
+  (toString [this] (str (vec (rows this)))))
 
 (defn width
   "The width of a grid in cells."
