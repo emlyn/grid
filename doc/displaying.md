@@ -37,7 +37,7 @@ You can use `print-table` to display a grid in various formats:
 ;; ╚════════╩════════╩════════╩════════╝
 ```
 
-This is the same functino that is used to display grids in the REPL.
+This is the same function that is used to display grids in the REPL.
 You can set the default options to change how they are shown:
 
 ```clojure
